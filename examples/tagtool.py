@@ -22,7 +22,13 @@
 # -----------------------------------------------------------------------------
 from __future__ import print_function
 
+# 追加
 import commands
+import subprocess
+import re
+import requests
+import pygame.mixer
+# 追加ここまで
 
 import logging
 log = logging.getLogger('main')
@@ -289,7 +295,7 @@ class TagTool(CommandLineInterface):
     def on_rdwr_connect(self, tag):
         if self.options.authenticate is not None:
             if len(self.options.authenticate) > 0:
-                key, msg = self.options.authenticate, tag.identifier                
+                key, msg = self.options.authenticate, tag.identifier
                 password = hmac.new(key, msg, hashlib.sha256).digest()
             else:
                 password = "" # use factory default password
@@ -321,7 +327,25 @@ class TagTool(CommandLineInterface):
         return True
 
     def show_tag(self, tag):
+        pygame.mixer.init()
+        pygame.mixer.music.load('./button70.mp3')
+        pygame.mixer.music.play()
         print(tag)
+        str = tag.__str__()
+        pattern = "(.*)ID=(\w+)"
+        match = re.search(pattern, str)
+
+        if match is None:
+        	print('Card ID is not detected or Card has different standard')
+        else:
+            id = match.group(2)
+            response = requests.post(
+                'http://localhost:3000/card_read',
+                {'uuid': id})
+            print(response.json())
+            # CURL版（一応）
+            # cmd = "curl -H \"Content-Type: application/json\" -d '{\"uuid\": \"01100410F2145B01\"}' http://localhost:3000/card_read?uuid=" + id
+            # print(subprocess.call(cmd, shell=True))
 
         if tag.ndef:
             print("NDEF Capabilities:")

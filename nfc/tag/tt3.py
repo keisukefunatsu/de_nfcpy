@@ -244,8 +244,7 @@ class Type3Tag(nfc.tag.Tag):
         self._nfcid = bytearray(self.idm)
 
     def __str__(self):
-        s = " PMM={pmm} SYS={sys:04X}"
-        print(commands.getoutput("ls -la"))
+        s = " PMM={pmm} SYS={sys:04X}"        
         return nfc.tag.Tag.__str__(self) + s.format(
             pmm=hexlify(self.pmm).upper(), sys=self.sys)
 
